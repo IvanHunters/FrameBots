@@ -1,7 +1,7 @@
 <?php
 include "Api/apiClass.php";
 
-class Vkbot extends Vk{
+class VkBot extends Vk{
     function __construct($confirm, $t_group, $t_user = false, $t_db = false){
         $this->varchar_init($confirm, $t_group, $t_user, $t_db);
     }
