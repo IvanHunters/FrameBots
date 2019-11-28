@@ -1,4 +1,5 @@
 <?php
+namespace VK;
 
 class Audio{
     public function send(){

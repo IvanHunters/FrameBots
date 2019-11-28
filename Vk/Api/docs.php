@@ -1,6 +1,7 @@
 <?php
+namespace VK;
 
-class Dosc{
+class Docs{
     public function upload_file($file){
         $upload_url = $this->apiCallGroup("docs.getMessagesUploadServer",array('type'=>'doc'))['response']['upload_url'];
         $aPost = array(

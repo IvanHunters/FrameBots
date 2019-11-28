@@ -1,15 +1,18 @@
 <?php
-include "Api/apiClass.php";
+namespace VKCallback;
+require "Api/apiClass.php";
 
-class VkBot extends Vk{
-    function __construct($confirm, $t_group, $t_user = false, $t_db = false){
+class VKBot extends \VK\API{
+    
+    public function __construct($confirm, $t_group, $t_user = false, $t_db = false){
+        parent::__construct($t_group, $t_user);
         $this->varchar_init($confirm, $t_group, $t_user, $t_db);
     }
     
-    function return_ok($return){
+    function return_ok($return = true){
         
         ob_start();
-        if(is_null($return))    echo "ok";
+        if($return)    echo "ok";
         else echo $return;
         $size = ob_get_length();
         header("Content-Encoding: none");
@@ -21,10 +24,11 @@ class VkBot extends Vk{
         if(session_id()) session_write_close();
     }
     
-    function varchar_init($confirm, $t_group, $t_user, $t_db){
+    private function varchar_init($confirm, $t_group, $t_user, $t_db){
         
         $this->data = $data = json_decode(file_get_contents('php://input'));
-        $type = $data->type;
+        if(!isset($data->type)) die(print_r($this, true));
+        $this->type = $type = $data->type;
         
         if($type != "confirmation")
             $this->return_ok();
@@ -36,7 +40,8 @@ class VkBot extends Vk{
         $this->token_group  = $t_group;
         
         if(!is_null($type))
-        $this->$type();
+        $this->{$type}();
+        die($type);
     }
     
     function type($type_name){

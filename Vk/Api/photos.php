@@ -1,4 +1,5 @@
 <?php
+namespace VK;
 
 class Photos{
     public function upload_photo($file){

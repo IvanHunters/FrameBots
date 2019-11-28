@@ -1,23 +1,27 @@
 <?php
-
-class Messages{
-    
+namespace VK;
+require "mainClass.php";
+class Messages extends \VK\Main{
     public function send($message , $attachments = ''){
         return $this->messageFromGroup($message,$attachments);
     }
-    function messageFromUser($user,$message){
+    
+    function messageFromUser($message, $user = false){
        return print_r($this->apiCallUser("messages.send",array('message'=>$message, 'user_id'=>$user)),true);
     }
-    function messageFromGroup($message, $attachments = false, $flag = false){
-        if($this->user_id != $this->chat)
-            return $this->apiCallGroup("messages.send",['message'=>"[id".$this->user_id."|Ответ], $message", 'peer_id'=>$this->chat, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
     
-        $mass = array('message'=>$message, 'user_id'=>$this->chat, 'dont_parse_links'=>1, 'attachment'=>$attachments, 'dont_parse_links'=>1, 'keyboard'=>$this->keyboard);
+    function messageFromGroup($message, $attachments = false, $flag = false){
+        if($this->user_id != $this->chat_id)
+            return $this->apiCallGroup("messages.send",['message'=>"[id".$this->user_id."|Ответ], $message", 'peer_id'=>$this->chat_id, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
+    
+        $mass = array('message'=>$message, 'user_id'=>$this->user_id, 'dont_parse_links'=>1, 'attachment'=>$attachments, 'dont_parse_links'=>1, 'keyboard'=>$this->keyboard);
        
         if($flag) unset($mass['keyboard']);
         
+        $response = $this->apiCallGroup("messages.send",$mass);
         return $response;
     }
+    
     public function close_keyboard(){
        $this->keyboard = '{"buttons":[],"one_time":true}';
     }
