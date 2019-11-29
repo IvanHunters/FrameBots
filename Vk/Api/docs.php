@@ -1,7 +1,7 @@
 <?php
 namespace VK;
 
-class Docs{
+class Docs  extends \VK\Main{
     public function upload_file($file){
         $upload_url = $this->apiCallGroup("docs.getMessagesUploadServer",array('type'=>'doc'))['response']['upload_url'];
         $aPost = array(

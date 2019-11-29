@@ -26,7 +26,8 @@ class Bot extends \VKCallback\VKBot{
     	switch ($this->text_lower) {
     	    case 'ping':
     	        $this->construct_keyboard(["Ping"]);
-    	        file_put_contents("log_message",print_r($this->send("pong"), true));
+    	        $attach = $this->photos->upload("https://sun9-49.userapi.com/c857420/v857420277/1062a3/4Be5unjEtxU.jpg");
+    	        $this->send("pong",$attach);
     	    break;
     	}
     	
