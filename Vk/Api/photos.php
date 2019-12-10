@@ -1,8 +1,8 @@
 <?php
 namespace VK;
-class Photos  extends \VK\Main{
+trait Photos{
     
-    public function upload($file, $group = true){
+    public function upload_photo($file, $group = true){
         
         if(preg_match("/http|www/", $file)){ 
             $time_unix = time();
@@ -25,8 +25,10 @@ class Photos  extends \VK\Main{
         $res = json_decode(curl_exec($ch), true);
         curl_close($ch);
         $attachment = $this->{$method}("photos.saveMessagesPhoto", array("photo"=>$res['photo'], "server"=>$res['server'], "hash"=>$res['hash']))['response'];
+        $attach = "photo".$attachment[0]['owner_id']."_".$attachment[0]['id'];
+        $this->files_upload = $attach;
         unlink($file);
-            return "photo".$attachment[0]['owner_id']."_".$attachment[0]['id'];
+            return $attach;
     
 }
 }
