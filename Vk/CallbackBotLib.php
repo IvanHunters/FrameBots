@@ -13,7 +13,7 @@ class BOT extends \VK\API{
         
         ob_start();
         if($return)    echo "ok";
-        else echo $return;
+        else echo $this->confirm;
         $size = ob_get_length();
         header("Content-Encoding: none");
         header("Content-Length: {$size}");
@@ -28,7 +28,6 @@ class BOT extends \VK\API{
         
         $this->data = $data = json_decode(file_get_contents('php://input'));
         $this->confirm = $confirm;
-        
         if($data->type == "confirmation")   $this->return_ok(false);
         else $this->return_ok();
         

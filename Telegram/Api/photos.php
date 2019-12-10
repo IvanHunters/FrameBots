@@ -11,7 +11,7 @@ trait Photos{
             $file = $new_file;
         }
         
-        $bot = $this->files_upload = $file;
+        $this->files_upload = $file;
     }
     
     public function send_photo($post_fields){

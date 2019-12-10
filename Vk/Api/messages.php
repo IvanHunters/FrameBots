@@ -35,6 +35,7 @@ trait Messages{
     public function construct_keyboard($arr_keyboard, $type_keyboard = "normal"){
         if($type_keyboard == "inline"){
             $keyboard['inline'] = true;
+            if(count($arr_keyboard) > 5) $arr_keyboard = array_slice($arr_keyboard, 0, 5);
         }
         $keyboard['buttons']=array();
             
