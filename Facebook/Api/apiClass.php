@@ -1,12 +1,19 @@
 <?php
+namespace FB;
 
-class Facebook{
+require_once "messages.php";
+/*require_once "photos.php";
+require_once "audio.php";
+require_once "docs.php";*/
+
+class Main{
     
+    protected $token;
     public function __construct($token){
         $this->token = $token;
     }
     
-    private function curl($url,$param){
+    function curl($url,$param){
         usleep(334000);
         $headers = ['Content-Type: application/json',];
     	$ch = curl_init();
@@ -21,34 +28,9 @@ class Facebook{
     	return $data; // Парсим JSON и отдаем
     }
     
-    private function apiCall($method,$param){
+    function apiCall($method,$param){
         $url = "https://graph.facebook.com/v2.6/me/{$method}?access_token={$this->token}";
         return $this->curl($url,$param);
-    }
-    
-    
-    public function construct_keyboard($array_keyboard){
-        foreach($array_keyboard as $but){
-            if(!is_array($but)) $button['title'] = $but;
-            if(!isset($but['type'])) $button['type'] = "postback";
-            if(!isset($but['payload'])) $button['payload'] = $button['title'];
-            $buttons[]=$button;
-        }
-        $this->keyboard = $buttons;
-    }
-    
-    public function message_send($text_message, $user_id = false){
-        if($this->keyboard)
-            $message = ["attachment"=>["type"=>"template","payload"=>["template_type"=>"button","text"=>$text_message, "buttons"=>$this->keyboard]]];
-        else 
-            $message = array("text"=>$text_message);
-        
-        if($user_id) $this->sender_id = $user_id;
-        $body_request = json_encode(["recipient"=>array("id"=>$this->sender_id),
-                                     "message"=>$message]);
-        $response = $this->apiCall("messages",$body_request);
-        
-        return $response;
     }
     
     function set_log($log_message){
@@ -59,4 +41,20 @@ class Facebook{
             fwrite($this->fp,$log_message);
         }
     }
+}
+
+class API extends Main{
+    
+    use Messages;
+/*  use Photos;
+    use Docs;
+    use Audio;*/
+    
+    public function __construct($token) {
+        $this->token               = $token;
+        
+        $this->keyboard            = false;
+        $this->attachment_for_send = false;
+    }
+    
 }
