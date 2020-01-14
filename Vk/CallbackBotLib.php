@@ -4,7 +4,7 @@ require "Api/apiClass.php";
 
 class BOT extends \VK\API{
     
-    public function __construct($confirm, $t_group, $t_user = false, $status = false){
+    public function __construct($confirm, $t_group, $t_user = false, $status = false){ 
         parent::__construct($t_group, $t_user);
         $this->varchar_init($confirm, $t_group, $t_user, $status);
     }
