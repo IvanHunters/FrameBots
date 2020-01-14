@@ -7,6 +7,9 @@
     
     $platforms                      = ["vk"=>"Vk", "tg"=>"Telegram", "fb"=>"Facebook"];
     $debug                          = false; // Статус дебага
+    
+//  include                         "../../Database/mainClass.php";
+//  $db                             = new \DB("username","pass","database");    
     $db                             = false;
     
     /*------------------------------------------------------------------*/
