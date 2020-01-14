@@ -19,12 +19,10 @@ trait Messages{
         if($this->user_id != $this->chat_id)
             return $this->apiCallGroup("messages.send",['message'=>"[id".$this->user_id."|Ответ], $message", "random_id"=>rand(1,100), 'peer_id'=>$this->chat_id, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
     
-        $message_param = array('message'=>$message, "random_id"=>rand(1,100), 'user_id'=>$this->user_id, 'dont_parse_links'=>1, 'attachment'=>$attachments, 'dont_parse_links'=>1);
-       
+        $message_param = array('message'=>$message, "random_id"=>rand(1,100), 'user_id'=>$this->user_id, 'attachment'=>$attachments, 'dont_parse_links'=>1);
+
         if(!$flag && $this->keyboard != false) $message_param['keyboard'] = $this->keyboard;
-        
         $response = $this->apiCallGroup("messages.send",$message_param);
-        print_r($this);
         return $response;
     }
     
@@ -43,12 +41,14 @@ trait Messages{
         	if(is_array($line)){
         	    if(isset($line['color'])){
         	        $keyboard = $keyboard['buttons'][$i][0] = $this->assoc_keyboard($line['text'],$line['color']);
+        	    }elseif(isset($line['type'])){
+        	        $keyboard['buttons'][$i][0] = $this->assoc_keyboard($line);
         	    }else{
         	        foreach($line as $buttons){
         	            if(is_array($buttons)){
             	            if(isset($buttons['color']))
             	                $keyboard['buttons'][$i][] = $this->assoc_keyboard($buttons['text'],$buttons['color']);
-            	            elseif(!isset($buttons['color']))
+        	                elseif(!isset($buttons['color']))
             	                $keyboard['buttons'][$i][] = $this->assoc_keyboard($buttons[0],$buttons[1]);
         	            }
         	            else $keyboard['buttons'][$i][] = $this->assoc_keyboard($buttons);
@@ -58,14 +58,16 @@ trait Messages{
         	    $keyboard['buttons'][$i][0] = $this->assoc_keyboard($line);
         	}
         }
-        
         $this->keyboard =json_encode($keyboard, JSON_UNESCAPED_UNICODE);
     }
     
-    private function assoc_keyboard($value, $color = "primary"){
-        if($value == "location") return ['action'=>['type'=>'location']];
-        elseif($value == "vk_pay")	return  ['action'=>['type'=>'vkpay','hash'=>"action=transfer-to-group&group_id={$this->group_id}&aid=10"]];
-        else return ['action'=>['type'=>'text','label'=>$value],'color'=>$color];
+    private function assoc_keyboard($value, $color = "primary", $label = false){
+        if(!$label){
+            if($value == "location") return ['action'=>['type'=>'location']];
+            elseif($value == "vk_pay")	return  ['action'=>['type'=>'vkpay','hash'=>"action=transfer-to-group&group_id={$this->group_id}&aid=10"]];
+            elseif($value['type'] == "link")	return  ['action'=>['type'=>'open_link','link'=>$value['link'],"label"=>$value['text']]];
+            else return ['action'=>['type'=>'text','label'=>$value],'color'=>$color];
+        }
     }
     
     public function keyboard_template($arr_keyboard, $type_keyboard = 3){

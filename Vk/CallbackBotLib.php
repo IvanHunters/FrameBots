@@ -4,15 +4,15 @@ require "Api/apiClass.php";
 
 class BOT extends \VK\API{
     
-    public function __construct($confirm, $t_group, $t_user = false, $t_db = false){
+    public function __construct($confirm, $t_group, $t_user = false, $status = false){
         parent::__construct($t_group, $t_user);
-        $this->varchar_init($confirm, $t_group, $t_user, $t_db);
+        $this->varchar_init($confirm, $t_group, $t_user, $status);
     }
     
     function return_ok($return = true){
         
         ob_start();
-        if($return)    echo "ok";
+        if($return)    echo 'ok';
         else echo $this->confirm;
         $size = ob_get_length();
         header("Content-Encoding: none");
@@ -24,14 +24,16 @@ class BOT extends \VK\API{
         if(session_id()) session_write_close();
     }
     
-    private function varchar_init($confirm, $t_group, $t_user, $t_db){
-        
+    private function varchar_init($confirm, $t_group, $t_user, $status){
+        global $db;
+        $this->status = $status;
+        $this->db  = $db;
         $this->data = $data = json_decode(file_get_contents('php://input'));
+        $this->client_info = $this->data->object->client_info;
         $this->confirm = $confirm;
         if($data->type == "confirmation")   $this->return_ok(false);
         else $this->return_ok();
         
-        $this->db = $t_db;
         $this->confirm  = $confirm;
         
         $this->token_user   = $t_user;
