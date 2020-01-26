@@ -3,6 +3,11 @@ namespace VK;
 trait Photos{
     
     public function upload_photo($file, $group = true){
+        if(is_null($file)) fwrite(fopen("log", "a+"), "\nfile is null");
+        if(preg_match("/^photo/imu", $file)){
+            $this->files_upload = $file;
+            return "none";
+        }
         
         if(preg_match("/http|www/", $file)){ 
             $time_unix = time();
@@ -27,7 +32,7 @@ trait Photos{
         $attachment = $this->{$method}("photos.saveMessagesPhoto", array("photo"=>$res['photo'], "server"=>$res['server'], "hash"=>$res['hash']))['response'];
         $attach = "photo".$attachment[0]['owner_id']."_".$attachment[0]['id'];
         $this->files_upload = $attach;
-        unlink($file);
+        if(file_exists($file))  unlink($file);
             return $attach;
     
 }

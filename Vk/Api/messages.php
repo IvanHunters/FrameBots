@@ -3,9 +3,13 @@ namespace VK;
 
 trait Messages{
     public function send($message, $user_id = false, $attachments = ''){
-        if(preg_match("/\_/",$user_id)) $attachments = $user_id;
-        elseif($user_id) $this->user_id = $this->chat_id = $user_id;
-        return $this->messageFromGroup($message,$attachments);
+        
+        if(is_array($message) || is_object($message)) 
+            $message = var_export($message, true);
+            
+        $status = $this->messageFromGroup($message,$attachments);
+        if(!isset($status['response'])) trigger_error(print_r($status, true), E_USER_WARNING);
+        return $status;
     }
     
     function messageFromUser($message, $user = false){
@@ -49,7 +53,7 @@ trait Messages{
             	            if(isset($buttons['color']))
             	                $keyboard['buttons'][$i][] = $this->assoc_keyboard($buttons['text'],$buttons['color']);
         	                elseif(!isset($buttons['color']))
-            	                $keyboard['buttons'][$i][] = $this->assoc_keyboard($buttons[0],$buttons[1]);
+            	                $keyboard['buttons'][$i][] = $this->assoc_keyboard(@$buttons[0],@$buttons[1]);
         	            }
         	            else $keyboard['buttons'][$i][] = $this->assoc_keyboard($buttons);
         	        }
@@ -65,7 +69,7 @@ trait Messages{
         if(!$label){
             if($value == "location") return ['action'=>['type'=>'location']];
             elseif($value == "vk_pay")	return  ['action'=>['type'=>'vkpay','hash'=>"action=transfer-to-group&group_id={$this->group_id}&aid=10"]];
-            elseif($value['type'] == "link")	return  ['action'=>['type'=>'open_link','link'=>$value['link'],"label"=>$value['text']]];
+            elseif(isset($value['type']) && $value['type'] == "link")	return  ['action'=>['type'=>'open_link','link'=>$value['link'],"label"=>$value['text']]];
             else return ['action'=>['type'=>'text','label'=>$value],'color'=>$color];
         }
     }

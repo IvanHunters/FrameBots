@@ -13,7 +13,7 @@ class BOT extends \VK\API{
         
         ob_start();
         if($return)    echo 'ok';
-        else echo $this->confirm;
+        else exit($this->confirm);
         $size = ob_get_length();
         header("Content-Encoding: none");
         header("Content-Length: {$size}");
@@ -29,25 +29,24 @@ class BOT extends \VK\API{
         $this->status = $status;
         $this->db  = $db;
         $this->data = $data = json_decode(file_get_contents('php://input'));
-        $this->client_info = $this->data->object->client_info;
         $this->confirm = $confirm;
         if($data->type == "confirmation")   $this->return_ok(false);
         else $this->return_ok();
+        $this->client_info = @$this->data->object->client_info;
         
         $this->confirm  = $confirm;
         
         $this->token_user   = $t_user;
         $this->token_group  = $t_group;
         
-        $this->chat_id         = $data->object->message->peer_id;
-    	$this->user_id      = $data->object->message->from_id;
-    	$this->group_id     = $data->group_id;
-    	$this->id_message   = $data->object->message->id;
-    	$this->text         = $data->object->message->text;
-    	$this->text_lower   = preg_replace("/\[(.*)\]\s/","",mb_strtolower($this->text));
-	    $this->publish_date = $data->object->message->date;
-        
-        $this->{$data->type}();
+        $this->chat_id      = @$data->object->message->peer_id;
+    	$this->user_id      = @$data->object->message->from_id;
+    	$this->group_id     = @$data->group_id;
+    	$this->id_message   = @$data->object->message->id;
+    	$this->text         = @$data->object->message->text;
+    	$this->text_lower   = @preg_replace("/\[(.*)\]\s/","",mb_strtolower($this->text));
+	    $this->publish_date = @$data->object->message->date;
+            $this->{$data->type}();
     }
     
     function type($type_name){
