@@ -18,7 +18,7 @@ class BOT extends \TG\API{
         if($set_webhook) return $this->token;
         
         $data = $this->data = json_decode(file_get_contents('php://input'), true);
-        
+        file_put_contents("log", var_export($data, true));
         if(isset($data["callback_query"])) $this->method_require = "keyboard_message";
         elseif(isset($data['message'])) $this->method_require = "message";
         else{
@@ -27,8 +27,8 @@ class BOT extends \TG\API{
         }
         
         if($this->method_require == "message"){
-            $this->message                  = $this->data["message"];
-            $this->message_id               = $this->message['message']['message_id'];
+            @$this->message                  = $this->data["message"];
+            @$this->message_id               = $this->message['message']['message_id'];
             $this->text                     = $this->message["text"];
             $this->text_lower               = preg_replace("/\//","",mb_strtolower($this->text));
             

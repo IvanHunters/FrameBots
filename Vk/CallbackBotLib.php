@@ -46,7 +46,9 @@ class BOT extends \VK\API{
     	$this->text         = @$data->object->message->text;
     	$this->text_lower   = @preg_replace("/\[(.*)\]\s/","",mb_strtolower($this->text));
 	    $this->publish_date = @$data->object->message->date;
-            $this->{$data->type}();
+	    
+        $this->{$data->type}();
+        $mysqli -> close();
     }
     
     function type($type_name){

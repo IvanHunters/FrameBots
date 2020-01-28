@@ -3,7 +3,6 @@ namespace VK;
 
 trait Messages{
     public function send($message, $user_id = false, $attachments = ''){
-        
         if(is_array($message) || is_object($message)) 
             $message = var_export($message, true);
             
@@ -13,7 +12,7 @@ trait Messages{
     }
     
     function messageFromUser($message, $user = false){
-       return print_r($this->apiCallUser("messages.send",array('message'=>$message, "random_id"=>rand(1,100), 'user_id'=>$user)),true);
+       return print_r($this->apiCallUser("messages.send",array('message'=>$message, "random_id"=>rand(1,100000000000000000000000), 'user_id'=>$user)),true);
     }
     
     function messageFromGroup($message, $attachments = false, $flag = false){
@@ -21,12 +20,15 @@ trait Messages{
             $attachments = $this->files_upload;
             
         if($this->user_id != $this->chat_id)
-            return $this->apiCallGroup("messages.send",['message'=>"[id".$this->user_id."|Ответ], $message", "random_id"=>rand(1,100), 'peer_id'=>$this->chat_id, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
+            return $this->apiCallGroup("messages.send",['message'=>"[id".$this->user_id."|Ответ], $message", "random_id"=>rand(1,100000000000000000000000), 'peer_id'=>$this->chat_id, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
     
-        $message_param = array('message'=>$message, "random_id"=>rand(1,100), 'user_id'=>$this->user_id, 'attachment'=>$attachments, 'dont_parse_links'=>1);
+        $message_param = array('message'=>$message, "random_id"=>rand(1,100000000000000000000000), 'user_id'=>$this->user_id, 'attachment'=>$attachments, 'dont_parse_links'=>1);
 
         if(!$flag && $this->keyboard != false) $message_param['keyboard'] = $this->keyboard;
         $response = $this->apiCallGroup("messages.send",$message_param);
+        $log_info['vk_request'] = $message_param;
+        $log_info['vk_response'] = $response;
+        //fwrite(fopen("log", "a+"), var_export($log_info, true));
         return $response;
     }
     
