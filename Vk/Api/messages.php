@@ -54,6 +54,7 @@ trait Messages{
         if(is_null($arrKeyboard)) trigger_error("Не передан параметр arr_keyboard", E_USER_WARNING);
         
         if($color){
+            
             if(is_array($arrKeyboard) || is_object($arrKeyboard) || is_array($color) || is_object($color)) 
                 trigger_error("arr_keyboard и color при передаче кнопки c цветом должны быть типа string", E_USER_WARNING);
             if(!in_array($color, $this->active_color)){
@@ -62,9 +63,10 @@ trait Messages{
             }
                 
          $this->addButton[] = [["text"=>$arrKeyboard, "color"=>$color]];   
-        }
-        else {
-            $this->addButton[] = $arrKeyboard;
+         
+        }else{
+            if(is_array($arrKeyboard))
+                $this->addButton[] = $arrKeyboard;
         }
         
     }

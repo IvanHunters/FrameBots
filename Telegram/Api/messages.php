@@ -45,9 +45,9 @@ trait Messages{
                 trigger_error("arr_keyboard и color при передаче кнопки c цветом должны быть типа string", E_USER_WARNING);
                 
          $this->addButton[] = [["text"=>$arrKeyboard, "color"=>$color]];   
-        }
-        else {
-            $this->addButton[] = $arrKeyboard;
+        }else {
+            if(is_array($arrKeyboard))
+                $this->addButton[] = $arrKeyboard;
         }
         
     }
