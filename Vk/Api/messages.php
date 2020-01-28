@@ -2,7 +2,13 @@
 namespace VK;
 
 trait Messages{
+    
+    protected $active_color = ["positive", "negative", "default", "primary"], $addButton = false;
+    
     public function send($message, $user_id = false, $attachments = ''){
+        
+        if(!is_null($this->addButton) && !isset($this->callConstructKeyboard)) $this->construct_keyboard(null);
+        
         if(is_array($message) || is_object($message)) 
             $message = var_export($message, true);
             
@@ -11,18 +17,19 @@ trait Messages{
         return $status;
     }
     
-    function messageFromUser($message, $user = false){
-       return print_r($this->apiCallUser("messages.send",array('message'=>$message, "random_id"=>rand(1,100000000000000000000000), 'user_id'=>$user)),true);
+    
+    protected function messageFromUser($message, $user = false){
+       return print_r($this->apiCallUser("messages.send",array('message'=>$message, "random_id"=>rand(1,100000), 'user_id'=>$user)),true);
     }
     
-    function messageFromGroup($message, $attachments = false, $flag = false){
+    protected function messageFromGroup($message, $attachments = false, $flag = false){
         if($this->files_upload)
             $attachments = $this->files_upload;
             
         if($this->user_id != $this->chat_id)
-            return $this->apiCallGroup("messages.send",['message'=>"[id".$this->user_id."|Ответ], $message", "random_id"=>rand(1,100000000000000000000000), 'peer_id'=>$this->chat_id, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
+            return $this->apiCallGroup("messages.send",['message'=>"[id".$this->user_id."|Ответ], $message", "random_id"=>rand(1,100000), 'peer_id'=>$this->chat_id, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
     
-        $message_param = array('message'=>$message, "random_id"=>rand(1,100000000000000000000000), 'user_id'=>$this->user_id, 'attachment'=>$attachments, 'dont_parse_links'=>1);
+        $message_param = array('message'=>$message, "random_id"=>rand(1,100000), 'user_id'=>$this->user_id, 'attachment'=>$attachments, 'dont_parse_links'=>1);
 
         if(!$flag && $this->keyboard != false) $message_param['keyboard'] = $this->keyboard;
         $response = $this->apiCallGroup("messages.send",$message_param);
@@ -32,18 +39,62 @@ trait Messages{
         return $response;
     }
     
+    
+    
+    
     public function close_keyboard(){
        $this->keyboard = '{"buttons":[],"one_time":true}';
     }
     
-    public function construct_keyboard($arr_keyboard, $type_keyboard = "normal"){
-        if($type_keyboard == "inline"){
+    
+    
+    
+    public function add_button($arrKeyboard, $color = false){
+        
+        if(is_null($arrKeyboard)) trigger_error("Не передан параметр arr_keyboard", E_USER_WARNING);
+        
+        if($color){
+            if(is_array($arrKeyboard) || is_object($arrKeyboard) || is_array($color) || is_object($color)) 
+                trigger_error("arr_keyboard и color при передаче кнопки c цветом должны быть типа string", E_USER_WARNING);
+            if(!in_array($color, $this->active_color)){
+                trigger_error("Цвет должен быть одним из ".implode(", ",$this->active_color), E_USER_WARNING);
+                $color = $this->active_color[0];
+            }
+                
+         $this->addButton[] = [["text"=>$arrKeyboard, "color"=>$color]];   
+        }
+        else {
+            $this->addButton[] = $arrKeyboard;
+        }
+        
+    }
+    
+    
+    
+    
+    public function construct_keyboard($arrKeyboard = Array(), $typeKeyboard = "normal"){
+        
+        $this->callConstructKeyboard = 1;
+        
+        if(!is_null($this->addButton)){
+            
+            if(is_null($arrKeyboard)){
+                
+                $arrKeyboard = $this->addButton;
+                
+            }else{
+                $arrKeyboard = array_merge($arrKeyboard, $this->addButton);
+                
+            }
+        }
+        
+        if($typeKeyboard == "inline"){
             $keyboard['inline'] = true;
-            if(count($arr_keyboard) > 5) $arr_keyboard = array_slice($arr_keyboard, 0, 5);
+            if(count($arrKeyboard) > 5) $arrKeyboard = array_slice($arrKeyboard, 0, 5);
         }
         $keyboard['buttons']=array();
             
-        foreach ($arr_keyboard as $i=>$line) {
+        foreach ($arrKeyboard as $i=>$line) {
         	if(is_array($line)){
         	    if(isset($line['color'])){
         	        $keyboard = $keyboard['buttons'][$i][0] = $this->assoc_keyboard($line['text'],$line['color']);
@@ -67,6 +118,9 @@ trait Messages{
         $this->keyboard =json_encode($keyboard, JSON_UNESCAPED_UNICODE);
     }
     
+    
+    
+    
     private function assoc_keyboard($value, $color = "primary", $label = false){
         if(!$label){
             if($value == "location") return ['action'=>['type'=>'location']];
@@ -76,13 +130,16 @@ trait Messages{
         }
     }
     
-    public function keyboard_template($arr_keyboard, $type_keyboard = 3){
+    
+    
+    
+    public function keyboard_template($arrKeyboard, $typeKeyboard = 3){
         $a = array();
         $a['buttons']=array();
         $i = 0;
         $i_2 = 0;
-    	foreach ($arr_keyboard as $value) {
-    	        if($i_2 > $type_keyboard){
+    	foreach ($arrKeyboard as $value) {
+    	        if($i_2 > $typeKeyboard){
     	            $i_2 = 0;
     	            $i++;
     	        }

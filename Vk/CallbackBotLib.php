@@ -26,6 +26,9 @@ class BOT extends \VK\API{
     
     private function varchar_init($confirm, $t_group, $t_user, $status){
         global $db;
+        global $platform;
+        
+        $this->platform = $platform;
         $this->status = $status;
         $this->db  = $db;
         $this->data = $data = json_decode(file_get_contents('php://input'));
@@ -48,7 +51,6 @@ class BOT extends \VK\API{
 	    $this->publish_date = @$data->object->message->date;
 	    
         $this->{$data->type}();
-        $mysqli -> close();
     }
     
     function type($type_name){

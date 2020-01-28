@@ -3,40 +3,84 @@ namespace TG;
 
 trait Messages{
     
+    protected $addButton = false;
+    
     public function send($text_message, $user_id = false){
+        
+        if(!is_null($this->addButton) && !isset($this->callConstructKeyboard)) $this->construct_keyboard(null);
+        
         $this->user_id = $user_id? $user_id: $this->user_id;
         $array_parametrs = ["chat_id"=>$this->user_id, "text"=>$text_message, "disable_web_page_preview"=>true];
+        
         if($this->keyboard) $array_parametrs['reply_markup'] = $this->keyboard;
+        
         if($this->files_upload){
+            
             $array_parametrs['photo'] =  new \CURLFile($this->files_upload);
             $response = $this->send_photo($array_parametrs);
+            
         }else{
             
             if(!is_null($this->message_id)){
+                
                 $array_parametrs["message_id"] = $this->message_id;
                 $response = $this->apiCall("editMessageText", $array_parametrs);
+                
             }else{
+                
                $response = $this->apiCall("sendMessage", $array_parametrs); 
+               
             }
         }
         
-        //sleep(1);
         return var_export($response, true);
     }
     
-    public function construct_keyboard($button_array, $type_keyboard = "inline"){
+    public function add_button($arrKeyboard, $color = false){
         
-        if(in_array("location", $button_array)) $type_keyboard = "normal";
-        if($type_keyboard == "inline")  $name_keyboard = "inline_keyboard";
+        if(is_null($arrKeyboard)) trigger_error("Не передан параметр arr_keyboard", E_USER_WARNING);
         
-        elseif($type_keyboard == "normal"){
+        if($color){
+            if(is_array($arrKeyboard) || is_object($arrKeyboard) || is_array($color) || is_object($color)) 
+                trigger_error("arr_keyboard и color при передаче кнопки c цветом должны быть типа string", E_USER_WARNING);
+                
+         $this->addButton[] = [["text"=>$arrKeyboard, "color"=>$color]];   
+        }
+        else {
+            $this->addButton[] = $arrKeyboard;
+        }
+        
+    }
+    
+    public function construct_keyboard($arrKeyboard, $typeKeyboard = "inline"){
+        
+        $this->callConstructKeyboard = 1;
+        
+        
+        if(!is_null($this->addButton)){
+            
+            if(is_null($arrKeyboard)){
+                
+                $arrKeyboard = $this->addButton;
+                
+            }else{
+                $arrKeyboard = array_merge($arrKeyboard, $this->addButton);
+                
+            }
+        }
+        
+        if(in_array("location", $arrKeyboard)) $typeKeyboard = "normal";
+        
+        if($typeKeyboard == "inline")  $name_keyboard = "inline_keyboard";
+        
+        elseif($typeKeyboard == "normal"){
             
             $name_keyboard = "keyboard";
             $keyboard["resize_keyboard"] = true;
             $keyboard["one_time_keyboard"] = true;
         }
         
-        foreach($button_array as $i => $buttons){
+        foreach($arrKeyboard as $i => $buttons){
             
             if(!is_array($buttons)){
                 
