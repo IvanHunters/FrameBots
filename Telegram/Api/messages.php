@@ -4,6 +4,7 @@ namespace TG;
 trait Messages{
     
     protected $addButton = false;
+    public $type_upload = false;
     
     public function send($text_message, $user_id = false){
         
@@ -14,7 +15,7 @@ trait Messages{
         
         if($this->keyboard) $array_parametrs['reply_markup'] = $this->keyboard;
         
-        if(isset($this->files_upload)){
+        if($this->files_upload){
             switch($this->type_upload){
                 case 'photo':
                     $array_parametrs['photo'] =  new \CURLFile($this->files_upload);
