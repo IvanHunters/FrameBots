@@ -1,10 +1,9 @@
 <?php
 namespace TG;
 
-trait Photos{
+trait Docs{
     
-    public function upload_photo($file, $chat_id = false){
-        
+    public function upload_file($file, $group = true){
         if(preg_match("/http|www/", $file)){ 
             preg_match("/[^.]+$/", $file, $ext);
             $time_unix = time();
@@ -14,15 +13,15 @@ trait Photos{
         }
         
         $this->files_upload = $file;
-        $this->type_upload = "photo";
+        $this->type_upload = "file";
     }
     
-    public function send_photo($post_fields){
+    public function send_file($post_fields){
         $post_fields['caption'] = $post_fields['text'];
         unset($post_fields['text']);
         
         $bot_url    = "https://api.telegram.org/bot{$this->token}/";
-        $url        = $bot_url . "sendPhoto?chat_id=" . $this->user_id ;
+        $url        = $bot_url . "sendDocument?chat_id=" . $this->user_id ;
         
         $ch = curl_init(); 
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -33,7 +32,6 @@ trait Photos{
         curl_setopt ($ch, CURLOPT_PROXY, $this->proxy); 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields); 
         $output = curl_exec($ch);
-        
         if(file_exists($this->files_upload))  unlink($this->files_upload);
         
         $this->files_upload = false;
@@ -41,6 +39,5 @@ trait Photos{
         
         return $output;
     }
-    
     
 }

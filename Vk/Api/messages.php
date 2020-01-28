@@ -3,17 +3,18 @@ namespace VK;
 
 trait Messages{
     
-    protected $active_color = ["positive", "negative", "default", "primary"], $addButton = false;
+    protected $active_color = ["positive", "negative", "default", "primary"], $addButton = false, $callConstructKeyboard = false;
     
     public function send($message, $user_id = false, $attachments = ''){
         
-        if(!is_null($this->addButton) && !isset($this->callConstructKeyboard)) $this->construct_keyboard(null);
+        if($this->addButton && $this->callConstructKeyboard) $this->construct_keyboard(null);
         
         if(is_array($message) || is_object($message)) 
             $message = var_export($message, true);
             
-        $status = $this->messageFromGroup($message,$attachments);
+        $status = $this->messageFromGroup($message, $attachments);
         if(!isset($status['response'])) trigger_error(print_r($status, true), E_USER_WARNING);
+        
         return $status;
     }
     
@@ -23,8 +24,12 @@ trait Messages{
     }
     
     protected function messageFromGroup($message, $attachments = false, $flag = false){
-        if($this->files_upload)
-            $attachments = $this->files_upload;
+        if(isset($this->files_upload)){
+            if(is_array($this->files_upload))
+                $attachments = implode(",",$this->files_upload);
+            else
+                $attachments = $this->files_upload;
+        }
             
         if($this->user_id != $this->chat_id)
             return $this->apiCallGroup("messages.send",['message'=>"[id".$this->user_id."|Ответ], $message", "random_id"=>rand(1,100000), 'peer_id'=>$this->chat_id, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
@@ -65,8 +70,7 @@ trait Messages{
          $this->addButton[] = [["text"=>$arrKeyboard, "color"=>$color]];   
          
         }else{
-            if(is_array($arrKeyboard))
-                $this->addButton[] = $arrKeyboard;
+            $this->addButton[] = $arrKeyboard;
         }
         
     }
@@ -78,13 +82,14 @@ trait Messages{
         
         $this->callConstructKeyboard = 1;
         
-        if(!is_null($this->addButton)){
+        if($this->addButton){
             
-            if(is_null($arrKeyboard)){
+            if(count($arrKeyboard) == 0){
                 
                 $arrKeyboard = $this->addButton;
                 
             }else{
+                
                 $arrKeyboard = array_merge($arrKeyboard, $this->addButton);
                 
             }

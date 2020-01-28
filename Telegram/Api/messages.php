@@ -7,18 +7,25 @@ trait Messages{
     
     public function send($text_message, $user_id = false){
         
-        if(!is_null($this->addButton) && !isset($this->callConstructKeyboard)) $this->construct_keyboard(null);
+        if($this->addButton && !isset($this->callConstructKeyboard)) $this->construct_keyboard(null);
         
         $this->user_id = $user_id? $user_id: $this->user_id;
         $array_parametrs = ["chat_id"=>$this->user_id, "text"=>$text_message, "disable_web_page_preview"=>true];
         
         if($this->keyboard) $array_parametrs['reply_markup'] = $this->keyboard;
         
-        if($this->files_upload){
-            
-            $array_parametrs['photo'] =  new \CURLFile($this->files_upload);
-            $response = $this->send_photo($array_parametrs);
-            
+        if(isset($this->files_upload)){
+            switch($this->type_upload){
+                case 'photo':
+                    $array_parametrs['photo'] =  new \CURLFile($this->files_upload);
+                    $response = $this->send_photo($array_parametrs);
+                break;
+                
+                case 'file':
+                    $array_parametrs['document'] =  new \CURLFile($this->files_upload);
+                    $response = $this->send_file($array_parametrs);
+                break;
+            }
         }else{
             
             if(!is_null($this->message_id)){
@@ -45,25 +52,25 @@ trait Messages{
                 trigger_error("arr_keyboard и color при передаче кнопки c цветом должны быть типа string", E_USER_WARNING);
                 
          $this->addButton[] = [["text"=>$arrKeyboard, "color"=>$color]];   
-        }else {
-            if(is_array($arrKeyboard))
-                $this->addButton[] = $arrKeyboard;
+        }else{
+            $this->addButton[] = $arrKeyboard;
         }
         
     }
     
-    public function construct_keyboard($arrKeyboard, $typeKeyboard = "inline"){
+    public function construct_keyboard($arrKeyboard = Array(), $typeKeyboard = "inline"){
         
         $this->callConstructKeyboard = 1;
         
         
-        if(!is_null($this->addButton)){
+        if($this->addButton){
             
-            if(is_null($arrKeyboard)){
+            if(count($arrKeyboard) == 0){
                 
                 $arrKeyboard = $this->addButton;
                 
             }else{
+                
                 $arrKeyboard = array_merge($arrKeyboard, $this->addButton);
                 
             }

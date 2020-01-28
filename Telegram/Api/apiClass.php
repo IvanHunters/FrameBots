@@ -3,8 +3,8 @@ namespace TG;
 
 require_once "messages.php";
 require_once "photos.php";
-/*require "audio.php";
-require "docs.php";*/
+require_once "docs.php";
+/*require "audio.php";*/
 
 class Main{
     
@@ -47,6 +47,7 @@ class API extends Main{
     
     use Messages;
     use Photos;
+    use Docs;
     
     public function __construct($token, $proxy = false) {
         $this->token                = $token;
