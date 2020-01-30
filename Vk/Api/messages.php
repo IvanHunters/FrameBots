@@ -3,11 +3,12 @@ namespace VK;
 
 trait Messages{
     
-    protected $active_color = ["positive", "negative", "default", "primary"], $addButton = false, $callConstructKeyboard = false;
+    protected $active_color = ["positive", "negative", "default", "primary"];
+    public $callConstructKeyboard = false, $addButton = false;
     
     public function send($message, $user_id = false, $attachments = ''){
         
-        if($this->addButton && $this->callConstructKeyboard) $this->construct_keyboard(null);
+        if($this->addButton && !$this->callConstructKeyboard)   $this->construct_keyboard();
         
         if(is_array($message) || is_object($message)) 
             $message = var_export($message, true);

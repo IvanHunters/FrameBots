@@ -18,7 +18,7 @@ class Main{
         echo $this->$why;
     }
 
-    function curl($link, $param,$flag=false){
+    function curl($link, $param, $flag=false){
         usleep(334000);
     	$ch = curl_init();
     	curl_setopt($ch, CURLOPT_URL, $link);

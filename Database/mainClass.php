@@ -12,7 +12,12 @@ class DB{
     
     function exq($query, $flag = false){
         $result = $this->mysqli->query($query);
-        if($flag || preg_match("/delete|insert|update/imu", $query)) return $result;
+        if($flag || preg_match("/delete|update/imu", $query)) return $result;
+        if(preg_match("/insert/imu", $query)){
+            file_put_contents("log", var_export($this->mysqli->insert_id, true));
+            $response['insert_id']  = (int)$this->mysqli->insert_id;
+            return $response;
+        }
         $result_fin = $result->fetch_assoc();
         $result_fin['count_rows'] = $result->num_rows;
         return $result_fin;

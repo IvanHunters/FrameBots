@@ -4,17 +4,19 @@ namespace TG;
 trait Messages{
     
     protected $addButton = false;
-    public $type_upload = false;
+    public $type_upload = false, $callConstructKeyboard = false;
     
     public function send($text_message, $user_id = false){
         
-        if($this->addButton && !isset($this->callConstructKeyboard)) $this->construct_keyboard(null);
+        if($this->addButton && !$this->callConstructKeyboard){
+            $this->construct_keyboard();
+            
+        } 
         
         $this->user_id = $user_id? $user_id: $this->user_id;
         $array_parametrs = ["chat_id"=>$this->user_id, "text"=>$text_message, "disable_web_page_preview"=>true];
         
         if($this->keyboard) $array_parametrs['reply_markup'] = $this->keyboard;
-        
         if($this->files_upload){
             switch($this->type_upload){
                 case 'photo':
@@ -33,6 +35,8 @@ trait Messages{
                 
                 $array_parametrs["message_id"] = $this->message_id;
                 $response = $this->apiCall("editMessageText", $array_parametrs);
+                
+               fwrite(fopen("log", "a+"), var_export($response, true));
                 
             }else{
                 
