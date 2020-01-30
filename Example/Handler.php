@@ -1,7 +1,8 @@
 <?php
 namespace Bot;
-$platform = $platforms[$_GET['platform']];
-require "../../{$platform}/CallbackBotLib.php";
+$platform = $_GET['platform'];
+$platform_work = $platforms[$_GET['platform']];
+require "../../{$platform_work}/CallbackBotLib.php";
 
 class Bot extends \Callback\BOT{
     
