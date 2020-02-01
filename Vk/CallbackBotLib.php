@@ -10,9 +10,9 @@ class BOT extends \VK\API{
     }
     
     function return_ok($return = true){
-        
+        ignore_user_abort(true);
         ob_start();
-        if($return)    echo 'ok';
+        if($return) echo ('ok');
         else exit($this->confirm);
         $size = ob_get_length();
         header("Content-Encoding: none");
@@ -21,6 +21,7 @@ class BOT extends \VK\API{
         ob_end_flush();
         ob_flush();
         flush();
+        if (function_exists('fastcgi_finish_request'))  fastcgi_finish_request();
         if(session_id()) session_write_close();
     }
     
@@ -32,6 +33,7 @@ class BOT extends \VK\API{
         $this->status = $status;
         $this->db  = $db;
         $this->data = $data = json_decode(file_get_contents('php://input'));
+        file_put_contents("last_req", file_get_contents('php://input'));
         $this->confirm = $confirm;
         if($data->type == "confirmation")   $this->return_ok(false);
         else $this->return_ok();

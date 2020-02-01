@@ -33,7 +33,7 @@ trait Messages{
         }
             
         if($this->user_id != $this->chat_id)
-            return $this->apiCallGroup("messages.send",['message'=>"[id".$this->user_id."|Ответ], $message", "random_id"=>rand(1,100000), 'peer_id'=>$this->chat_id, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
+            return $this->apiCallGroup("messages.send",['message'=>"id{$this->user_id}, $message", "random_id"=>rand(1,100000), 'peer_id'=>$this->chat_id, 'keyboard'=>$this->keyboard, 'attachment'=>$attachments]);
     
         $message_param = array('message'=>$message, "random_id"=>rand(1,100000), 'user_id'=>$this->user_id, 'attachment'=>$attachments, 'dont_parse_links'=>1);
 
